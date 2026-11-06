@@ -1,0 +1,212 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Calendário eleitoral 2026 | DEMOS</title>
+
+    <link rel="stylesheet" href="{% static 'core/css/demos.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/calendario.css' %}">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    >
+</head>
+
+<body>
+
+<header class="cabecalho">
+
+    <div class="cabecalho-esquerda">
+
+        <a
+            href="{% url 'salvos' %}"
+            class="icone-menu"
+            aria-label="Candidatos salvos"
+        >
+            <i class="fa-solid fa-bookmark"></i>
+        </a>
+
+        <a
+            href="{% url 'index' %}"
+            class="icone-menu"
+            aria-label="Início"
+        >
+            <i class="fa-solid fa-house"></i>
+        </a>
+
+    </div>
+
+    <a href="{% url 'index' %}" class="logo">
+
+        <img
+            src="{% static 'core/img/logo.png' %}"
+            alt="Logo DEMOS"
+        >
+
+        <span>DEMOS</span>
+
+    </a>
+
+    {% if user.is_authenticated %}
+
+    <div class="usuario-logado">
+
+        <span class="nome-usuario">
+            {{ user.username }}
+        </span>
+
+        <form
+            method="post"
+            action="{% url 'logout' %}"
+        >
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="botao-logout"
+            >
+                Sair
+            </button>
+
+        </form>
+
+    </div>
+
+    {% else %}
+
+    <a
+        href="{% url 'login' %}"
+        class="icone-menu"
+        aria-label="Entrar na conta"
+    >
+        <i class="fa-solid fa-circle-user"></i>
+    </a>
+
+    {% endif %}
+
+</header>
+
+<main class="pagina-calendario">
+
+    <div class="titulo-calendario">
+
+        <h1>Calendário eleitoral 2026</h1>
+
+        <p>
+            As principais datas da eleição, da preparação das candidaturas
+            até a posse dos eleitos.
+        </p>
+
+        <p class="nota-fonte">
+            Fonte:
+            <a
+                href="https://www.tse.jus.br/comunicacao/noticias/2026/Marco/eleicoes-2026-confira-as-principais-datas-do-calendario-eleitoral"
+                target="_blank"
+                rel="noopener"
+            >Tribunal Superior Eleitoral (TSE)</a>.
+            Conferido em 5 de novembro de 2026.
+        </p>
+
+    </div>
+
+    <section class="destaques" aria-label="Datas principais">
+
+        <div class="destaque">
+            <span>1º turno</span>
+            <strong>4 de outubro</strong>
+        </div>
+
+        <div class="destaque">
+            <span>2º turno</span>
+            <strong>25 de outubro</strong>
+        </div>
+
+        <div class="destaque">
+            <span>Diplomação</span>
+            <strong>até 18 de dezembro</strong>
+        </div>
+
+        <div class="destaque">
+            <span>Posse do presidente</span>
+            <strong>5 de janeiro de 2027</strong>
+        </div>
+
+    </section>
+
+    <p class="legenda">
+        <span class="status status--concluido">Concluído</span>
+        <span class="status status--agora">Em andamento</span>
+        <span class="status status--proximo">Próxima data</span>
+        <span class="legenda-texto">Situação calculada com a data de hoje.</span>
+    </p>
+
+    {% for fase in fases %}
+
+    <section class="fase">
+
+        <h2>{{ fase.titulo }}</h2>
+        <p class="fase-desc">{{ fase.descricao }}</p>
+
+        <ol class="linha-tempo">
+
+            {% for evento in fase.eventos %}
+
+            <li class="evento{% if evento.destaque %} evento--destaque{% endif %}{% if evento.status == 'concluido' %} evento--passado{% endif %}">
+
+                <div class="evento-topo">
+
+                    <time datetime="{{ evento.inicio|date:'Y-m-d' }}">
+                        {{ evento.rotulo }}
+                    </time>
+
+                    {% if evento.status %}
+                        <span class="status status--{{ evento.status }}">
+                            {{ evento.status_texto }}
+                        </span>
+                    {% endif %}
+
+                </div>
+
+                <h3>{{ evento.titulo }}</h3>
+
+                <p>{{ evento.texto }}</p>
+
+            </li>
+
+            {% endfor %}
+
+        </ol>
+
+    </section>
+
+    {% endfor %}
+
+    <p class="nota-rodape">
+        As datas podem ser alteradas por decisão da Justiça Eleitoral.
+        Confirme sempre no site do TSE ou no do seu Tribunal Regional Eleitoral.
+        A posse de senadores e deputados em 1º de fevereiro de 2027 não consta
+        na página do TSE usada como fonte principal; vem de reportagem e deve
+        ser conferida na Constituição e na Resolução do TSE antes de ser
+        citada como oficial.
+    </p>
+
+</main>
+
+<footer>
+
+    <strong>DEMOS</strong>
+
+    <p>
+        Política verdadeira.
+    </p>
+
+</footer>
+
+</body>
+</html>
